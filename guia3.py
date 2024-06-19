@@ -8,7 +8,7 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title='Gtk.TreeView Test')
 
-        self.music_playing = False  # Estado de reproducción de la música
+        self.musica = False  # Estado de reproducción de la música
 
         box = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL, spacing=20,
@@ -34,17 +34,23 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
         self.add_action(about_menu)
         menu.append("Acerca de", "win.about")
 
-        button_Adelantar = Gtk.Button(label="Retroceder")
+        button_Adelantar = Gtk.Button(label="Adelantar")
         button_Adelantar.connect("clicked", self.adelantar)
         header_bar.pack_start(button_Adelantar)
 
-        button_retroceder = Gtk.Button(label="Adelantar")
+        button_retroceder = Gtk.Button(label="Retroceder")
         button_retroceder.connect("clicked", self.show_retroceder)
         header_bar.pack_start(button_retroceder)
 
         self.button_reproducir = Gtk.Button(label="Reproducir")
-        self.button_reproducir.connect("clicked", self.toggle_play_pause)
+        self.button_reproducir.connect("clicked", self.reproducir_musica)
         header_bar.pack_start(self.button_reproducir)
+
+        self.button_Avance = Gtk.Button(label="Avance rapido")
+        self.button_Avance.connect("clicked", self.avance)
+        header_bar.pack_start(self.button_Avance)
+
+        
 
         self.set_child(box)
 
@@ -54,15 +60,8 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
         pygame.mixer.music.load("/home/liveuser/Downloads/plaga.mp3")  # Ruta de tu canción
 
     def adelantar(self, widget):
-        dialog = Gtk.FileChooserDialog(
-            title="Adelantar",
-            parent=self,
-            action=Gtk.FileChooserAction.SAVE
-        )
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("Archivo guardado:", dialog.get_filename())
-        dialog.destroy()
+        self.exito()
+       
 
     def show_about_dialog(self, action, param):
         self.about = Gtk.AboutDialog()
@@ -74,30 +73,77 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
         self.about.set_license_type(Gtk.License.GPL_3_0)
         self.about.set_version("4.0")
         self.about.set_logo_icon_name("org.example.example")
-        self.about.run()
-        self.about.destroy()
+        description = """
+        Esta aplicación permite realizar diversas acciones mediante botones:
+        - Botón Adelantar: Permite simular un dia .
+        - Botón Retroceder: Permite retroceder un dia.
+        - Botón Reproducir/Pausa: Controla la reproducción de música.
+        - Botòn Avance rapido: Permite elegir el numero de dias que quieres que simule.
+        """
+        self.about.set_comments(description)
+        self.about.show()
 
-    def toggle_play_pause(self, widget):
-        if self.music_playing:
+    def reproducir_musica(self, widget):
+        if self.musica:
             pygame.mixer.music.pause()
             self.button_reproducir.set_label("Reproducir")
         else:
             pygame.mixer.music.unpause()
             self.button_reproducir.set_label("Pausa")
-        self.music_playing = not self.music_playing
+        self.musica = not self.musica
 
     def show_retroceder(self, action):
-        dialog = Gtk.MessageDialog(
-            title="Exito",
-            transient_for=self,
-            default_width=300,
-            default_height=50
-        )
-        dialog.set_markup("Se ha limpiado correctamente")
-        dialog.add_button("OKEY", Gtk.ResponseType.CLOSE)
-        dialog.set_deletable(True)
-        dialog.connect("response", lambda dialog, response_id: dialog.destroy())
-        dialog.show()
+        self.exito()
+    
+    def avance(self, action):
+            dialog = Gtk.Dialog(
+                title="Avance rápido",
+                transient_for=self,
+                modal=True
+            )
+
+            content_area = dialog.get_content_area()
+
+            label = Gtk.Label()
+            label.set_text("Número de días que quieres avanzar:")
+            content_area.append(label)
+
+            self.entry_dias = Gtk.Entry()
+            content_area.append(self.entry_dias)
+
+            button_ok = Gtk.Button(label="OK")
+            button_ok.connect("clicked", self.on_avance_ok_clicked)
+            dialog.add_action_widget(button_ok, Gtk.ResponseType.OK)
+
+            button_cancel = Gtk.Button(label="Cancelar")
+            button_cancel.connect("clicked", lambda *args: dialog.destroy())
+            dialog.add_action_widget(button_cancel, Gtk.ResponseType.CANCEL)
+
+            dialog.show()
+
+    def on_avance_ok_clicked(self, widget):
+        dias = self.entry_dias.get_text()
+        print(f"Número de días ingresado: {dias}")
+
+        # Aquí puedes añadir la lógica para avanzar los días según la entrada del usuario
+
+        dialog = widget.get_parent()
+        dialog.response(Gtk.ResponseType.OK)
+
+       
+    def exito(self):
+            dialog = Gtk.MessageDialog(
+                title="Exito",
+                transient_for=self,
+                default_width=300,
+                default_height=50
+            )
+            dialog.set_markup("Se ha Realizado Corectamente")
+            dialog.add_button("OKEY", Gtk.ResponseType.CLOSE)
+            dialog.set_deletable(True)
+            dialog.connect("response", lambda dialog, response_id: dialog.destroy())
+            dialog.show()
+
 
 class Gtk4TestApp(Gtk.Application):
 
@@ -116,4 +162,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 
