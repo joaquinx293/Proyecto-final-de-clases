@@ -108,15 +108,25 @@ class Persona():
 
 def generar_personas(cantidad):
     personas = []
+    id = generar_id(cantidad)
     for _ in range(cantidad):
         persona = Persona()
         nombre, apellido = persona.nombre_apellidos()
-        personas.append({'Nombre': nombre, 'Apellido': apellido})
+        personas.append({'Nombre': nombre, 'Apellido': apellido,'ID': id[_] })
     return personas
 
+def generar_id(cantidad, longitud=10):
+    ids_generados = set()
+    id = []
+    while len(id) < cantidad:
+        nuevo_id = ''.join(random.choices('0123456789', k=longitud))
+        if nuevo_id not in ids_generados:
+            ids_generados.add(nuevo_id)
+            id.append(nuevo_id)
+    return id
 def escribir_csv(personas, archivo_salida):
     with open(archivo_salida, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['Nombre', 'Apellido']
+        fieldnames = ['Nombre', 'Apellido','ID']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for persona in personas:
