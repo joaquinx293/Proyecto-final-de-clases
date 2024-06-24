@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, Gio
 import pygame
+from personas import Persona
 
 class Gtk4TestTest(Gtk.ApplicationWindow):
 
@@ -60,6 +61,7 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
         pygame.mixer.music.load("/home/liveuser/Downloads/plaga.mp3")  # Ruta de tu canción
 
     def adelantar(self, widget):
+        Persona()
         self.exito()
        
 
@@ -103,32 +105,28 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
             )
 
             content_area = dialog.get_content_area()
-
+            Persona()
             label = Gtk.Label()
             label.set_text("Número de días que quieres avanzar:")
             content_area.append(label)
-
             self.entry_dias = Gtk.Entry()
             content_area.append(self.entry_dias)
-
+           
             button_ok = Gtk.Button(label="OK")
-            button_ok.connect("clicked", self.on_avance_ok_clicked)
+            button_ok.connect("clicked", self.on_avance_ok_clicked, dialog)
             dialog.add_action_widget(button_ok, Gtk.ResponseType.OK)
 
             button_cancel = Gtk.Button(label="Cancelar")
             button_cancel.connect("clicked", lambda *args: dialog.destroy())
             dialog.add_action_widget(button_cancel, Gtk.ResponseType.CANCEL)
+            dialog.show() 
+        
 
-            dialog.show()
-
-    def on_avance_ok_clicked(self, widget):
+    def on_avance_ok_clicked(self, widget,dialog):
         dias = self.entry_dias.get_text()
         print(f"Número de días ingresado: {dias}")
-
-        # Aquí puedes añadir la lógica para avanzar los días según la entrada del usuario
-
-        dialog = widget.get_parent()
-        dialog.response(Gtk.ResponseType.OK)
+        dialog.destroy()
+        return dias
 
        
     def exito(self):
@@ -155,13 +153,16 @@ class Gtk4TestApp(Gtk.Application):
         window.present()
         # Iniciar la reproducción automática al iniciar la aplicación
         pygame.mixer.music.play()
+        
 
 def main():
+    
     app = Gtk4TestApp()
     app.run()
 
 if __name__ == '__main__':
     main()
+
 
 
 
