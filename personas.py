@@ -112,7 +112,7 @@ def generar_personas(cantidad):
     for _ in range(cantidad):
         persona = Persona()
         nombre, apellido = persona.nombre_apellidos()
-        personas.append({'Nombre': nombre, 'Apellido': apellido,'ID': id[_] })
+        personas.append({'Nombre': nombre, 'Apellido': apellido,'ID': id[_], 'Estado': None, 'contador':None })
     return personas
 
 def generar_id(cantidad, longitud=10):
@@ -126,7 +126,7 @@ def generar_id(cantidad, longitud=10):
     return id
 def escribir_csv(personas, archivo_salida):
     with open(archivo_salida, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['Nombre', 'Apellido','ID']
+        fieldnames = ['Nombre', 'Apellido','ID','Estado','contador']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for persona in personas:
