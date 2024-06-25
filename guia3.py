@@ -3,19 +3,26 @@ gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, Gio
 import pygame
 from personas import Persona
+import csv
 
 class Gtk4TestTest(Gtk.ApplicationWindow):
 
     def __init__(self, app):
         super().__init__(application=app, title='Gtk.TreeView Test')
-
-        self.musica = False  # Estado de reproducción de la música
+        
+        self.musica = True
 
         box = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL, spacing=20,
             margin_top=20, margin_bottom=20,
             margin_start=20, margin_end=20
         ) 
+
+        # self.textview = Gtk.TextView()
+        # self.textview.set_editable(False)  
+        # self.textview.set_cursor_visible(False)  
+        # box.append(self.textview) 
+
 
         header_bar = Gtk.HeaderBar.new()
         self.set_titlebar(titlebar=header_bar)
@@ -54,14 +61,23 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
         
 
         self.set_child(box)
+        self.cargar_archivo()
 
-        # Inicializar Pygame y Pygame.mixer para la reproducción de audio
+       
         pygame.init()
         pygame.mixer.init()
-        pygame.mixer.music.load("/home/liveuser/Downloads/plaga.mp3")  # Ruta de tu canción
+        pygame.mixer.music.load("/home/liveuser/Downloads/plaga.mp3")  
+    def cargar_archivo(self):
+        csv_file = "/home/liveuser/Downloads/personas.csv"
+        try:
+            with open(csv_file, newline='') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    print(row)
+        except FileNotFoundError:
+            print(f"Error: No se pudo encontrar el archivo CSV en {csv_file}")
 
     def adelantar(self, widget):
-        Persona()
         self.exito()
        
 
@@ -74,7 +90,9 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
         self.about.set_copyright("Joaquin Aliro Marambio Romero")
         self.about.set_license_type(Gtk.License.GPL_3_0)
         self.about.set_version("4.0")
-        self.about.set_logo_icon_name("org.example.example")
+
+
+
         description = """
         Esta aplicación permite realizar diversas acciones mediante botones:
         - Botón Adelantar: Permite simular un dia .
@@ -105,7 +123,6 @@ class Gtk4TestTest(Gtk.ApplicationWindow):
             )
 
             content_area = dialog.get_content_area()
-            Persona()
             label = Gtk.Label()
             label.set_text("Número de días que quieres avanzar:")
             content_area.append(label)
@@ -162,6 +179,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
 
 
 
