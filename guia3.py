@@ -5,7 +5,7 @@ import pygame
 from personas import Persona
 import csv
 
-class Gtk4TestTest(Gtk.ApplicationWindow):
+class Ventana(Gtk.ApplicationWindow):
 
     def __init__(self, app):
         super().__init__(application=app, title='Gtk.TreeView Test')
@@ -166,7 +166,7 @@ class Gtk4TestApp(Gtk.Application):
         super().__init__()
 
     def do_activate(self):
-        window = Gtk4TestTest(self)
+        window = Ventana(self)
         window.present()
         # Iniciar la reproducción automática al iniciar la aplicación
         pygame.mixer.music.play()
@@ -179,6 +179,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
 
 
 
