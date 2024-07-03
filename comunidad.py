@@ -1,40 +1,53 @@
-import csv
 import random
 
-class Comunidad:
-    def __init__(self, num_ciudadanos, promedio_conexion_fisica, probabilidad_conexion_fisica):
-        self.num_ciudadanos = num_ciudadanos
-        self.promedio_conexion_fisica = promedio_conexion_fisica
-        self.probabilidad_conexion_fisica = probabilidad_conexion_fisica
-        self.personas = []
+class Enfermedad:
+    def __init__(self, beta, gamma, promedio_pasos):
+        self.beta = beta
+        self.gamma = gamma
+        self.promedio_pasos = promedio_pasos
+        self.contador_muertes = 0  
     
-    def cargar_personas_desde_csv(self, archivo_csv):
-        with open(archivo_csv, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                self.personas.append({
-                    'Nombre': row['Nombre'],
-                    'Apellido': row['Apellido'],
-                    'ID': row['ID'],
-                    'Estado': 'Sano', 
-                    'familia': row['Apellido'],
-                    'Conexiones': [],
-                    'ConexionesFamiliares': [],
-                    'Contador': 0 
-                })
-        return self.personas
+    def inicializar_infectados(self, comunidad, num_infectados):
+        infectados_iniciales = random.sample(comunidad.personas, num_infectados)
+        
+        for infectado in infectados_iniciales:
+            infectado['Estado'] = 'Infectado'
+            infectado['Contador'] = self.promedio_pasos
     
-    def numero_personas(self):
-        return len(self.personas)
-    
-    def crear_conexiones(self):
-        for persona in self.personas:
-            num_conexiones = int(random.gauss(self.promedio_conexion_fisica, 1))
-            conexiones = random.sample(self.personas, num_conexiones)
-            persona['Conexiones'] = [conexion['ID'] for conexion in conexiones]
-            #conexiones_familiares = [p['ID'] for p in self.personas if p['familia'] == persona['familia'] and p['ID'] != persona['ID']]
-            #persona['ConexionesFamiliares'] = conexiones_familiares
+    def propagar_enfermedad(self, comunidad):
+        nuevos_infectados = []
+        nuevos_recuperados = []
+        
+        S, I, R = self.contar_sir(comunidad)
+        N = S + I + R
+        
+        for persona in comunidad.personas:
+            if persona['Estado'] == 'Infectado':
+                for conexion_id in persona['Conexiones'] + persona['ConexionesFamiliares']:
+                    if random.random() < comunidad.probabilidad_conexion_fisica:
+                        otra_persona = next((p for p in comunidad.personas if p['ID'] == conexion_id), None)
+                        if otra_persona and otra_persona['Estado'] == 'Sano':
+                            if random.random() < (self.beta * I / N):
+                                nuevos_infectados.append(otra_persona)
 
-    def imprimir_estado(self):
-        for persona in self.personas:
-            print(f"Nombre: {persona['Nombre']}, Apellido: {persona['Apellido']}, ID: {persona['ID']}, Estado: {persona['Estado']}, Familia: {persona['familia']}")
+                persona['Contador'] -= 1
+                if persona['Contador'] <= 0:
+                    if random.random() < self.gamma:
+                        persona['Estado'] = 'Recuperado'
+                        nuevos_recuperados.append(persona)
+                    else:
+                        persona['Estado'] = 'Muerto'
+                        self.contador_muertes += 1  
+
+        for infectado in nuevos_infectados:
+            infectado['Estado'] = 'Infectado'
+            infectado['Contador'] = self.promedio_pasos
+
+    def contar_sir(self, comunidad):
+        S = sum(1 for persona in comunidad.personas if persona['Estado'] == 'Sano')
+        I = sum(1 for persona in comunidad.personas if persona['Estado'] == 'Infectado')
+        R = sum(1 for persona in comunidad.personas if persona['Estado'] == 'Recuperado')
+        return S, I, R
+
+    def obtener_muertes(self):
+        return self.contador_muertes
