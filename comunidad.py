@@ -1,5 +1,6 @@
 import csv
 import random
+import numpy as np
 
 class Comunidad:
     def __init__(self, num_ciudadanos, promedio_conexion_fisica, probabilidad_conexion_fisica):
@@ -29,11 +30,17 @@ class Comunidad:
     
     def crear_conexiones(self):
         for persona in self.personas:
-            num_conexiones = int(random.gauss(self.promedio_conexion_fisica, 1))
-            conexiones = random.sample(self.personas, num_conexiones)
+            # Genera el número de conexiones basado en una distribución normal con numpy
+            num_conexiones = int(np.random.normal(self.promedio_conexion_fisica, 1))
+            # Asegúrate de que el número de conexiones no sea negativo
+            num_conexiones = max(0, num_conexiones)
+            # Selecciona al azar las conexiones
+            if num_conexiones > len(self.personas) - 1:
+                num_conexiones = len(self.personas) - 1
+            conexiones = np.random.choice(self.personas, num_conexiones, replace=False)
             persona['Conexiones'] = [conexion['ID'] for conexion in conexiones]
-            #conexiones_familiares = [p['ID'] for p in self.personas if p['familia'] == persona['familia'] and p['ID'] != persona['ID']]
-            #persona['ConexionesFamiliares'] = conexiones_familiares
+            # Puedes añadir conexiones familiares aquí si es necesario
+            
 
     def imprimir_estado(self):
         for persona in self.personas:
