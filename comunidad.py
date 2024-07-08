@@ -30,16 +30,17 @@ class Comunidad:
     
     def crear_conexiones(self):
         for persona in self.personas:
-            # Genera el número de conexiones basado en una distribución normal con numpy
             num_conexiones = int(np.random.normal(self.promedio_conexion_fisica, 1))
-            # Asegúrate de que el número de conexiones no sea negativo
             num_conexiones = max(0, num_conexiones)
-            # Selecciona al azar las conexiones
             if num_conexiones > len(self.personas) - 1:
                 num_conexiones = len(self.personas) - 1
             conexiones = np.random.choice(self.personas, num_conexiones, replace=False)
             persona['Conexiones'] = [conexion['ID'] for conexion in conexiones]
-            # Puedes añadir conexiones familiares aquí si es necesario
+            conexiones_familiares = [
+                p['ID'] for p in self.personas 
+                if p['familia'] == persona['familia'] and p['ID'] != persona['ID']
+            ]
+            persona['ConexionesFamiliares'] = conexiones_familiares
             
 
     def imprimir_estado(self):
