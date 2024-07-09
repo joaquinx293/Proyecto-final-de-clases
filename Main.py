@@ -8,6 +8,7 @@ from gi.repository import Gtk, Gio
 import pygame
 import csv
 import matplotlib
+import pandas as pd
 
 class Ventana(Gtk.ApplicationWindow):
 
@@ -44,10 +45,6 @@ class Ventana(Gtk.ApplicationWindow):
         button_Adelantar.connect("clicked", self.adelantar)
         header_bar.pack_start(button_Adelantar)
 
-        button_retroceder = Gtk.Button(label="Retroceder")
-        button_retroceder.connect("clicked", self.show_retroceder)
-        header_bar.pack_start(button_retroceder)
-
         self.button_reproducir = Gtk.Button(label="Reproducir")
         self.button_reproducir.connect("clicked", self.reproducir_musica)
         header_bar.pack_start(self.button_reproducir)
@@ -66,8 +63,6 @@ class Ventana(Gtk.ApplicationWindow):
         # Inicializar comunidad y enfermedad
         self.inicializar_simulacion()
 
-
-    
     def inicializar_simulacion(self):
         cantidad_personas = 1000
         personas = generar_personas(cantidad_personas)
@@ -137,8 +132,7 @@ class Ventana(Gtk.ApplicationWindow):
             self.button_reproducir.set_label("Pausa")
         self.musica = not self.musica
 
-    def show_retroceder(self, action):
-        self.exito()
+
     
     def avance(self, action):
         dialog = Gtk.Dialog(
@@ -198,7 +192,26 @@ class Ventana(Gtk.ApplicationWindow):
             recuperados.append(R)
             muertes = self.enfermedad.obtener_muertes()
             print(f"Susceptibles: {S}, Infectados: {I}, Recuperados: {R}, Muertes: {muertes}")
+            datos_personas = []
+            for persona in self.comunidad.personas:
+                datos_persona = {
+                    'ID': persona['ID'],
+                    'Nombre': persona['Nombre'],
+                    'Apellido': persona['Apellido'],
+                    'Estado': persona['Estado'],
+                    'Familia': persona['familia']
+                }
+                datos_personas.append(datos_persona)
+            nombre_archivo = f'datos_simulacion_dia_{dia + 1}.csv'
+            
+            with open(nombre_archivo, 'w', newline='', encoding='utf-8') as csvfile:
+                fieldnames = ['ID', 'Nombre', 'Apellido', 'Estado', 'Familia']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for persona in datos_personas:
+                    writer.writerow(persona)
         self.mostrar_grafico(susceptibles, infectados, recuperados)
+        
 
     def mostrar_grafico(self, susceptibles, infectados, recuperados):
         dias = list(range(1, len(susceptibles) + 1))
@@ -214,18 +227,21 @@ class Ventana(Gtk.ApplicationWindow):
         plt.grid(True)
         plt.savefig('grafico.png')
         plt.close()
-        
+
 
 class Gtk4TestApp(Gtk.Application):
 
     def __init__(self):
         super().__init__()
 
+
     def do_activate(self):
         window = Ventana(self)
         window.present()
         pygame.mixer.music.play()
+      
 
 if __name__ == "__main__":
     app = Gtk4TestApp()
     app.run()
+
