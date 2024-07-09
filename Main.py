@@ -1,3 +1,4 @@
+
 import matplotlib.pyplot as plt
 from comunidad import Comunidad
 from enfermedad import Enfermedad
@@ -10,7 +11,7 @@ import csv
 import matplotlib
 import pandas as pd
 
-class Ventana(Gtk.ApplicationWindow):
+class Ventana(Gtk.ApplicationWindow):# genera la infeccion 
 
     def __init__(self, app):
         super().__init__(application=app, title='Gtk.TreeView Test')
@@ -63,14 +64,14 @@ class Ventana(Gtk.ApplicationWindow):
         # Inicializar comunidad y enfermedad
         self.inicializar_simulacion()
 
-    def inicializar_simulacion(self):
+    def inicializar_simulacion(self):# da los datos para iniciar la simulacion 
         cantidad_personas = 1000
         personas = generar_personas(cantidad_personas)
         archivo_salida = 'personas_para_comunidad.csv'
         escribir_csv(personas, archivo_salida)
         
         self.beta = 0.25
-        self.gamma = 0.3
+        self.gamma = 0.3# probabilidad de recuperarce 
         self.promedio_pasos = 49
         self.num_ciudadanos = 1000
         self.promedio_conexion_fisica = 5
@@ -213,7 +214,7 @@ class Ventana(Gtk.ApplicationWindow):
         self.mostrar_grafico(susceptibles, infectados, recuperados)
         
 
-    def mostrar_grafico(self, susceptibles, infectados, recuperados):
+    def mostrar_grafico(self, susceptibles, infectados, recuperados):# graficar
         dias = list(range(1, len(susceptibles) + 1))
         matplotlib.use('Agg')
         plt.figure(figsize=(10, 6))
@@ -244,4 +245,3 @@ class Gtk4TestApp(Gtk.Application):
 if __name__ == "__main__":
     app = Gtk4TestApp()
     app.run()
-
