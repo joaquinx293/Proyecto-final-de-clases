@@ -1,6 +1,8 @@
+
 import csv
 import random
 import numpy as np
+
 
 class Comunidad:
     def __init__(self, num_ciudadanos, promedio_conexion_fisica, probabilidad_conexion_fisica):
